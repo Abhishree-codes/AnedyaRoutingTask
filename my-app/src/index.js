@@ -7,16 +7,6 @@ import { ChakraProvider } from '@chakra-ui/react'
 import {BrowserRouter} from 'react-router-dom'
 import AuthContextProvider from './context/AuthContextProvider';
 
-//toast 
-// hamburger dropdown
-//local storage persistence?
-//spinner 
-//loader 
-//errors messages clear
-// check flow and add comments 
-// deploy 
-// check flow again 
-//add doc 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

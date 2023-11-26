@@ -4,9 +4,10 @@ import {
   Flex,
   HStack,
   IconButton,
+  CloseButton,
   Text
 } from "@chakra-ui/react";
-
+import { AiOutlineMenu } from "react-icons/ai";
 import { useContext } from "react";
 import {
 
@@ -16,7 +17,6 @@ import {
   Stack,
 } from "@chakra-ui/react";
 
-// Inside your component
 
 
 
@@ -57,7 +57,9 @@ export default function NavBar(){
     {path:"/profile", onClick:()=>handleLinkClick("/profile"),label: "Profile"}
   ];
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const mobileNav = useDisclosure();
+  
 
   return (
       location.pathname==="/login"||location.pathname==="/signup" ? (<></>):(
@@ -73,20 +75,46 @@ export default function NavBar(){
         px={4}
         py={2}
       >
-      <Box  bg={"transparent"} px={2} color={"white"} fontWeight={"bold"}>
-        <Flex h={15} padding={6} alignItems={"center"} justifyContent={"space-between"}>
-          <IconButton
-            _hover={{
-              textDecoration: "none",
-              bg: "#87c3ea",
-            }}
-            size={"md"}
-            icon={isOpen ? "" :""}
-            aria-label={"Open Menu"}
-            display={{ md: "none" }}
-            onClick={isOpen ? onClose : onOpen}
-          />
+      <Box  bg={"transparent"} px={2} color={"white"} fontWeight={"bold"} >
+        <Flex h={15} py={6} alignItems={"center"} justifyContent={"space-between"}>
+        {(
+          <Box  display={{base:"inline-flex", md: "none" }}>
+              <IconButton
+                display={{ base: "flex", md: "none" }}
+                aria-label="Open menu"
+                fontSize="20px"
+                color="gray.800"
+                _dark={{ color: "inherit" }}
+                variant="ghost"
+                icon={mobileNav.isOpen ? <CloseButton aria-label="Close menu"/>:<AiOutlineMenu/>}
+                onClick={mobileNav.isOpen? mobileNav.onClose :mobileNav.onOpen}
+                _hover={{ bg: "#87c3ea"}}
+              />
+
+            <Stack  pos={"absolute"}
+            border={"1px solid #e0dbdb"}
+            mt={10}
+            width={"200px"}
+              zIndex={10000} as={"nav"} spacing={4}  bg={"white"} borderRadius={5} padding={2} textAlign={"left"} color="black" display={mobileNav.isOpen ? "flex" : "none"}>
+        
+              {Paths.map((ele) => (
+
+                <Link key={ele.label} to={ele.path}
+               >
+                   <ChakraLink px={2}
+                py={1}
+                rounded={'md'}
+                _hover={{
+                  textDecoration: 'none',
+                  bg: "#87c3ea"
+                }}>
+                  {ele.label} </ChakraLink></Link>
+              ))}
+            </Stack>
+          </Box>
+        )}
           <HStack spacing={8} alignItems={"center"} color={"black"}>
+
             <Box>
             <Text
 fontStyle="italic"
@@ -100,7 +128,7 @@ fontWeight="bold"
             <HStack
               as={"nav"}
               spacing={4}
-              display={{ base: "none", md: "flex" }}
+              display={{ base: "none", md: "inline-flex" }}
               justifyContent="center"
             >
               {Paths.map((ele) => (
@@ -125,25 +153,7 @@ fontWeight="bold"
           </Flex>
         </Flex>
 
-        {isOpen ? (
-          <Box pb={4} display={{ md: "none" }}>
-            <Stack as={"nav"} spacing={4}  bg={"white"} borderRadius={5} padding={2} textAlign={"left"} color="black">
-              {Paths.map((ele) => (
-
-                <Link key={ele.label} to={ele.path}
-               >
-                   <ChakraLink px={2}
-                py={1}
-                rounded={'md'}
-                _hover={{
-                  textDecoration: 'none',
-                  bg: "#87c3ea"
-                }}>
-                  {ele.label} </ChakraLink></Link>
-              ))}
-            </Stack>
-          </Box>
-        ) : null}
+      
       </Box>
       </Box>
       </Box>

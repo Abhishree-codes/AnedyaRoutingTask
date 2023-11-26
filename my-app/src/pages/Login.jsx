@@ -10,7 +10,7 @@ const initialValues={
   password: "",
 }
 function Login() {
-    //replace alerts with toast 
+
     const [show, setShow] = useState(false)
     const handleClickForPassword = () => setShow(!show)
 

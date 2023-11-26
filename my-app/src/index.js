@@ -7,8 +7,13 @@ import { ChakraProvider } from '@chakra-ui/react'
 import {BrowserRouter} from 'react-router-dom'
 import AuthContextProvider from './context/AuthContextProvider';
 
-//styling and r4esponsive 
-// checkk flow and add comments 
+//toast 
+// hamburger dropdown
+//local storage persistence?
+//spinner 
+//loader 
+//errors messages clear
+// check flow and add comments 
 // deploy 
 // check flow again 
 //add doc 

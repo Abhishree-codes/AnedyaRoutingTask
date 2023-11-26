@@ -1,11 +1,12 @@
+import { Box } from '@chakra-ui/react'
 import React from 'react'
 
 function Home() {
   return (
-    <div>
+    <Box  mt={100}>
       React Routing Task 
       Home page 
-    </div>
+    </Box>
   )
 }
 

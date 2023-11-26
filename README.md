@@ -13,13 +13,13 @@ In short, the login page is simply not added in the browsing stack after success
 - [Formik](https://formik.org/) and [Yup](https://github.com/jquense/yup) for form validation.
 - [Chakra UI](https://chakra-ui.com/) for styling.
 - [Netlify](https://www.netlify.com/) for deploying the app.
-- Local storage for storing user data 
+- Local storage for storing user data upon registration
 
 ## Protected Routes
 
 The protected Routes I've added are: 
-- About Page 
-- Profile Page
+- About Page (/about)
+- Profile Page (/profile)
 
 ## 🔗 Links
 
@@ -28,12 +28,12 @@ The protected Routes I've added are:
 
 ## Credentials
 
-You can login using these hardcoded credentials:
-email: task@gmail.com
-password: task123
+**You can login using these hardcoded credentials:**
+
+- **Email:** task@gmail.com
+- **Password:** task123
 
 You can also choose to register and then use your registered email and password to login.
-
 
 ## To run locally
 

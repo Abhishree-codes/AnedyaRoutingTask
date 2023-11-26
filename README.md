@@ -23,7 +23,7 @@ The protected Routes I've added are:
 
 ## 🔗 Links
 
-[![netflify](https://img.shields.io/badge/netflify-blue?style=for-the-badge&logo=netflify&logoColor=white)]()
+[![netflify](https://img.shields.io/badge/netflify-blue?style=for-the-badge&logo=netflify&logoColor=white)](https://peaceful-taffy-feb394.netlify.app/)
 
 
 ## Credentials

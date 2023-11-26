@@ -1,9 +1,10 @@
-import React, { useContext, useState } from "react";
-import { Button, Input, Text ,FormLabel,FormControl,FormErrorMessage,InputRightElement,InputGroup, Stack, Flex, Heading, Checkbox, Image} from "@chakra-ui/react";
+import React, { useContext, useEffect, useState } from "react";
+import { Button, Input, Text ,FormLabel,FormControl,FormErrorMessage,InputRightElement,InputGroup, Stack, Flex, Heading, Checkbox, Image, useToast} from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContextProvider";
 import {loginSchema} from "../schemas/schemaLogin"
 import { useFormik } from "formik";
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const initialValues={
   email: "",
@@ -11,9 +12,49 @@ const initialValues={
 }
 function Login() {
 
+  const toast = useToast();
+
+  const emailError = () => {
+    toast({
+      title: "User with this email doesn't exist",
+      description: "",
+      status: 'error',
+      duration: 1000,
+      isClosable: true,
+    });
+  };
+
+  const passwordError=()=>{
+    toast({
+      title: "Invalid Password",
+      description: "",
+      status: 'error',
+      duration: 1000,
+      isClosable: true,
+    });
+  }
+
+  const loginSuccess=()=>{
+    toast({
+      title: "Login Successful",
+      description: "",
+      status: 'success',
+      duration: 1000,
+      isClosable: true,
+    });
+  }
+  const [showLoader, setShowLoader] = useState(true)
+
     const [show, setShow] = useState(false)
     const handleClickForPassword = () => setShow(!show)
+    
+    useEffect(()=>{
+  setTimeout(()=>{
+    setShowLoader(false)
+  },500)
+},[])
 
+    
 
    
     const { values, errors, touched, handleBlur, handleChange, handleSubmit } = useFormik({
@@ -27,10 +68,12 @@ function Login() {
           action.resetForm();
           handleLogin();
        //if im not coming from a protected route replace should be false 
+       loginSuccess()
           navigate(from, { replace: true });
     
         } else if (values.email  === "task@gmail.com") {
-          alert("invalid password");
+      
+          passwordError()
         } else {
           const usersArray = JSON.parse(localStorage.getItem("users")) || [];
           let isUser = false;
@@ -40,16 +83,21 @@ function Login() {
               if (ele.password === values.password) {
                 action.resetForm();
                 handleLogin();
-                navigate(from, { replace: true });
-        
+                loginSuccess()
+         
+                   navigate(from, { replace: true });   
+               
+              
               } else {
-                alert("invalid password");
+             
+               passwordError()
                 return;
               }
             }
           });
           if (!isUser) {
-            alert("user with this email doesn't exist");
+            emailError()
+  
           }
         }
         
@@ -72,7 +120,9 @@ function Login() {
   }
 
   return (
-    <Flex textAlign={"left"} width={"100%"} height={"100vh"} justifyContent={"center"} alignItems={"center"} padding={10}>
+  showLoader ?
+    <LoadingSpinner/>:
+   ( <Flex textAlign={"left"} width={"100%"} height={"100vh"} justifyContent={"center"} alignItems={"center"} padding={10}>
     <Stack  minH={{base:"90vh",sm:"30vh",md:"60vh"}} width={{base:"90%",sm:"90%",md:"900px"}} margin={"auto"} direction={{ base: 'column', md: 'row' }} borderRadius={5} boxShadow={"rgba(100, 100, 111, 0.2) 0px 7px 29px 0px"}>
            <Flex flex={1}>
         <Image
@@ -177,6 +227,8 @@ function Login() {
   
     </Stack>
     </Flex>
+  )
+  
   );
 }
 

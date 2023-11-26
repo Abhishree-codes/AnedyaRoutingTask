@@ -2,7 +2,7 @@ import {
   FormControl,
   FormErrorMessage,
   Input,
-  FormLabel,Box, InputGroup, InputRightElement, Button, Flex, Image
+  FormLabel,Box, InputGroup, InputRightElement, Button, Flex, Image, useToast
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import { signUpSchema } from "../schemas/schemaSignUp";
@@ -12,8 +12,9 @@ import {
   Text,
 } from '@chakra-ui/react';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate} from 'react-router-dom'
+import LoadingSpinner from "../components/LoadingSpinner";
 
 
 
@@ -27,6 +28,7 @@ const initialValues={
   confirm: ""
 }
 export default function SignUp() {
+  const [showLoader, setShowLoader] = useState(true)
 
   const [show, setShow] = useState(false)
   const [showConfirm,setShowConfirm] = useState(false)
@@ -34,9 +36,33 @@ export default function SignUp() {
   const handleClickForConfirm = ()=>setShowConfirm(!showConfirm)
   const location = useLocation()
   const from = location.state?.from || "/";
+  const toast = useToast();
+
+  const emailExistsError = () => {
+    toast({
+      title: "Email is already registered!",
+      description: "",
+      status: 'error',
+      duration: 1000,
+      isClosable: true,
+    });
+  };
+  const signupSuccess=()=>{
+    toast({
+      title: "Registeration Successful",
+      description: "",
+      status: 'success',
+      duration: 1000,
+      isClosable: true,
+    });
+  }
 
   
-
+  useEffect(()=>{
+    setTimeout(()=>{
+      setShowLoader(false)
+    },500)
+  },[])
 
 
   const navigate=useNavigate()
@@ -60,7 +86,8 @@ export default function SignUp() {
         users.forEach((ele)=>{
 
           if(ele.email === values.email|| values.email==="task@gmail.com"){
-            alert("Email already exists!")
+           // alert("Email already exists!")
+           emailExistsError()
             doesUserExist= true 
             return 
           }
@@ -77,7 +104,8 @@ export default function SignUp() {
     password: values.password,
   },
 ]))
-      alert("Sign Up successful!")
+      //alert("Sign Up successful!")
+      signupSuccess()
       action.resetForm();
       //go back to login 
       navigate('/login', { replace: true ,state:{from:{pathname:from}}});
@@ -87,6 +115,7 @@ export default function SignUp() {
 
 
     return (
+      showLoader ? <LoadingSpinner/>:
       <Flex textAlign={"left"} width={"100%"} height={"100vh"} justifyContent={"center"} alignItems={"center"} padding={10}>
          <Stack  minH={{base:"90vh",sm:"30vh",md:"60vh"}} width={{base:"90%",sm:"90%",md:"900px"}} margin={"auto"} direction={{ base: 'column', md: 'row' }} borderRadius={5} boxShadow={"rgba(100, 100, 111, 0.2) 0px 7px 29px 0px"}>
          <Flex flex={1}>
@@ -236,9 +265,8 @@ export default function SignUp() {
           </FormControl>
        
       <Text mb='0'>
-      By signing up, you agree to our Privacy Policy and Terms & Conditions
+      By signing up, you agree to our <Text as={"span"} _hover={{cursor:"pointer"}} color={"blue.500"}>Privacy Policy and Terms & Conditions</Text>
       </Text>
-
       <Button
       colorScheme={'blue'} variant={'solid'}
               isDisabled={errors.firstName || errors.lastName || errors.email || errors.password || errors.confirm || values.firstName===""|| values.lastName===""||values.confirm===""||values.password===""||values.email===""}

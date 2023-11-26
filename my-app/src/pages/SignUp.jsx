@@ -2,7 +2,7 @@ import {
   FormControl,
   FormErrorMessage,
   Input,
-  FormLabel,Box
+  FormLabel,Box, InputGroup, InputRightElement, Button, Flex, Image
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import { signUpSchema } from "../schemas/schemaSignUp";
@@ -24,7 +24,6 @@ import { useLocation, useNavigate} from 'react-router-dom'
 //toast 
 //spinner 
 //loader 
-//show password
 
 
 const initialValues={
@@ -36,12 +35,16 @@ const initialValues={
 }
 export default function SignUp() {
 
-
+  const [show, setShow] = useState(false)
+  const [showConfirm,setShowConfirm] = useState(false)
+  const handleClickForPassword = () => setShow(!show)
+  const handleClickForConfirm = ()=>setShowConfirm(!showConfirm)
   const location = useLocation()
   const from = location.state?.from || "/";
 
+  
 
-  const [submitStatus, setSubmitStatus]=useState(false)
+
 
   const navigate=useNavigate()
 
@@ -71,7 +74,7 @@ export default function SignUp() {
         })
       
       if(!doesUserExist){
-        setSubmitStatus(true)
+
                 //add to local and redirect to login 
       localStorage.setItem("users",JSON.stringify([
   ...users,
@@ -89,41 +92,26 @@ export default function SignUp() {
     },
   });
 
-//   console.log("touched",touched)
-// console.log(
-//   "Registration ~ errors",
-//   errors
-// );
-  
 
-// console.log(errors.firstName, touched.firstName)
     return (
-      <Box position={'relative'}>
-        <Container
-          as={SimpleGrid}
-          maxW={'7xl'}
-          columns={{ base: 1, md: 2 }}
-          spacing={{ base: 10, lg: 32 }}
-          py={{ base: 10, sm: 20, lg: 32 }}>
-          <Stack
-            bg={'gray.50'}
-            rounded={'xl'}
-            p={{ base: 4, sm: 6, md: 8 }}
-            spacing={{ base: 8 }}
-            maxW={{ lg: 'lg' }}>
-            <Stack spacing={4}>
-              <Heading
-                color={'gray.800'}
-                lineHeight={1.1}
-                fontSize={{ base: '2xl', sm: '3xl', md: '4xl' }}>
-              Sign Up
-               
-              </Heading>
-            </Stack>
-           
-  
-            <form mt={10} onSubmit={handleSubmit}>
-              <Stack spacing={4}>
+      <Flex textAlign={"left"} width={"100%"} height={"100vh"} justifyContent={"center"} alignItems={"center"} padding={10}>
+         <Stack  minH={{base:"90vh",sm:"30vh",md:"60vh"}} width={{base:"90%",sm:"90%",md:"900px"}} margin={"auto"} direction={{ base: 'column', md: 'row' }} borderRadius={5} boxShadow={"rgba(100, 100, 111, 0.2) 0px 7px 29px 0px"}>
+         <Flex flex={1}>
+        <Image
+        borderTopLeftRadius={{base:5,sm:5,md:5}}
+          alt={'Login Image'}
+          objectFit={'cover'}
+          borderTopRightRadius={5}
+          borderBottomLeftRadius={{base:0,sm:0,md:5}}
+          src={
+            'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80'
+          }
+        />
+      </Flex>
+      <Flex p={8} flex={1} align={'center'} justify={'center'}>
+      <Stack  as="form" onSubmit={handleSubmit} spacing={4} w={'full'} maxW={'md'}>
+      <Heading fontSize={'2xl'}>Sign Up</Heading>
+ 
              <FormControl isInvalid={touched.firstName && errors.firstName}>
             <FormLabel htmlFor="firstName" >First Name</FormLabel>
                 <Input
@@ -191,7 +179,10 @@ export default function SignUp() {
           </FormControl>
           <FormControl isInvalid={touched.password && errors.password}>
             <FormLabel>Password</FormLabel>
+            <InputGroup size='md'>
             <Input
+             pr='4.5rem'
+             type={show ? 'text' : 'password'}
             placeholder="Enter password"
             bg={'gray.100'}
             border={0}
@@ -200,12 +191,18 @@ export default function SignUp() {
               color: 'gray.500',
             }}
             id="password"
-              type="password"
               name="password"
               value={values.password}
               onChange={handleChange}
               onBlur={handleBlur}
             />
+            <InputRightElement width='4.5rem'>
+        <Button h='1.75rem' size='sm' onClick={handleClickForPassword}>
+          {show ? 'Hide' : 'Show'}
+        </Button>
+      </InputRightElement>
+            </InputGroup>
+           
             {errors.password && (
               <FormErrorMessage>{errors.password}</FormErrorMessage>
             )}
@@ -215,6 +212,7 @@ export default function SignUp() {
             // isDisabled={isConfirmPasswordDisabled}
           >
             <FormLabel>Confirm Password</FormLabel>
+            <InputGroup size='md'>
             <Input
            placeholder="Confirm password"
            bg={'gray.100'}
@@ -224,12 +222,21 @@ export default function SignUp() {
              color: 'gray.500',
            }}
            id="confirm"
-              type="password"
+           pr='4.5rem'
+           type={showConfirm ? 'text' : 'password'}
               name="confirm"
               onChange={handleChange}
               value={values.confirm}
               onBlur={handleBlur}
+
             />
+            <InputRightElement width='4.5rem'>
+        <Button h='1.75rem' size='sm' onClick={handleClickForConfirm}>
+          {showConfirm ? 'Hide' : 'Show'}
+        </Button>
+      </InputRightElement>
+            </InputGroup>
+         
             {errors.confirm && (
               <FormErrorMessage>{errors.confirm}</FormErrorMessage>
             )}
@@ -239,28 +246,29 @@ export default function SignUp() {
       By signing up, you agree to our Privacy Policy and Terms & Conditions
       </Text>
 
-                
-              </Stack>
-              <Input
+      <Button
+      colorScheme={'blue'} variant={'solid'}
               isDisabled={errors.firstName || errors.lastName || errors.email || errors.password || errors.confirm || values.firstName===""|| values.lastName===""||values.confirm===""||values.password===""||values.email===""}
-              type="submit" value="Submit"
+              type="submit" 
                 fontFamily={'heading'}
-                mt={8}
-                w={'full'}
-                bgGradient="linear(to-r, #01d5a1, #053d4c)"
-                color={'white'}
-                _hover={{
-                  bgGradient: 'linear(to-r, #01d5a1, #053d4c)',
-                  boxShadow: 'xl',
+               
          
-                }}/>
-                <Text>Already Have An Account? <Text onClick={()=>navigate("/login",{ replace: true ,state:{from:{pathname:from}}})}>Sign In</Text></Text>
-            </form>
-        
-        
-          </Stack>
-        </Container>
-      </Box>
+              >Sign Up</Button>
+               <Flex gap={2} flexDirection={{base:"column",sm:"row",md:"row"}} justifyContent={"flex-start"}>
+               <Text>Already Have An Account? 
+
+</Text>
+<Text  _hover={{ cursor: 'pointer' }} color={'blue.500'} onClick={()=>navigate("/login",{ replace: true ,state:{from:{pathname:from}}})}>Sign In</Text>
+               </Flex>
+  
+              </Stack>
+ 
+           
+      </Flex>
+         </Stack>
+        </Flex>
+
+     
     );
   
 }

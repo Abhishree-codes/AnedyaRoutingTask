@@ -7,9 +7,8 @@ import { ChakraProvider } from '@chakra-ui/react'
 import {BrowserRouter} from 'react-router-dom'
 import AuthContextProvider from './context/AuthContextProvider';
 
-
-//hard coded credentials 
-// what are the protected routes 
+//remove react logo 
+// add comments 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

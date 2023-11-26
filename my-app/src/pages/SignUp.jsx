@@ -2,8 +2,10 @@ import {
   FormControl,
   FormErrorMessage,
   Input,
-  FormLabel,useToast,Box
+  FormLabel,Box
 } from "@chakra-ui/react";
+import { useFormik } from "formik";
+import { signUpSchema } from "../schemas/schemaSignUp";
 import {
   Stack,
   Heading,
@@ -15,135 +17,86 @@ import {
 import { useState } from "react";
 import { useLocation, useNavigate} from 'react-router-dom'
 
-import * as yup from "yup";
 
 
-//same email 
-//disable button
+
+
 //toast 
 //spinner 
 //loader 
 //show password
-const schema = yup.object().shape({
-  firstName: yup
-    .string()
-    .required("First name is required")
-    .min(3, "First name should be at least 3 characters"),
-  lastName: yup
-    .string()
-    .required("Last name is required")
-    .min(3, "Last name should be at least 3 characters"),
-  email: yup
-    .string()
-    .required("Email is required")
-    .email("Invalid email address"),
-  password: yup
-    .string()
-    .required("Password is required")
-    .min(8, "Password should be at least 8 characters")
-    .max(20, "Password should not exceed 20 characters")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-      "Password should contain at least one uppercase letter, one lowercase letter, one digit, and one special character"
-    ),
-  confirm: yup
-    .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match")
-    .required("Confirm password is required")
-});
 
+
+const initialValues={
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  confirm: ""
+}
 export default function SignUp() {
-  const [details, setDetails] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirm: ""
-  });
+
+
   const location = useLocation()
   const from = location.state?.from || "/";
 
-  const toast = useToast()
+
   const [submitStatus, setSubmitStatus]=useState(false)
-  const [errors, setErrors] = useState({});
+
   const navigate=useNavigate()
 
 
+  const { values, errors, touched, handleBlur, handleChange, handleSubmit } = useFormik({
+    initialValues,
+    validationSchema: signUpSchema,
+    validateOnChange: true,
+      validateOnBlur: false,
+    onSubmit: (values, action) => {
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
+      // console.log(
+      //   "~ Registration ~ values",
+      //   values
+      // );
+    
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      let doesUserExist = false 
 
-    if (name === 'password') {
-      schema
-        .validateAt(name, { [name]: value })
-        .then(() => {
-          setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
+        users.forEach((ele)=>{
+
+          if(ele.email === values.email|| values.email==="task@gmail.com"){
+            alert("Email already exists!")
+            doesUserExist= true 
+            return 
+          }
         })
-        .catch((err) => {
-          setErrors((prevErrors) => ({ ...prevErrors, [name]: err.message }));
-        });
-    }
-  };
-
-  const isConfirmPasswordDisabled = !details.password || !!errors.password;
-
-
-  const handleSubmit = (e) => {
-    console.log(submitStatus,"status")
-    e.preventDefault();
-
-    schema
-      .validate(details, { abortEarly: false })
-      .then(() => {
-        // Validation passed
-        //check for same email 
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-        let doesUserExist = false 
-
-          users.forEach((ele)=>{
-
-            if(ele.email === details.email|| details.email==="task@gmail.com"){
-              alert("Email already exists!")
-              doesUserExist= true 
-              return 
-            }
-          })
-        
-        if(!doesUserExist){
-          setSubmitStatus(true)
-                  //add to local and redirect to login 
-        localStorage.setItem("users",JSON.stringify([
-    ...users,
-    {
-      name: details.firstName + " " + details.lastName,
-      email: details.email,
-      password: details.password,
-    },
-  ]))
-        alert("Sign Up successful!")
-        //go back to login 
-        navigate('/login', { replace: true ,state:{from:{pathname:from}}});
-        }
-      })
-      .catch((err) => {
-        console.log(err)
-  
-
-        const fieldErrors = {};
-
-        err.inner.forEach((error) => {
-          fieldErrors[error.path] = error.message;
-        });
-
-        setErrors(fieldErrors);
-      });
       
-  };
+      if(!doesUserExist){
+        setSubmitStatus(true)
+                //add to local and redirect to login 
+      localStorage.setItem("users",JSON.stringify([
+  ...users,
+  {
+    name: values.firstName + " " + values.lastName,
+    email: values.email,
+    password: values.password,
+  },
+]))
+      alert("Sign Up successful!")
+      action.resetForm();
+      //go back to login 
+      navigate('/login', { replace: true ,state:{from:{pathname:from}}});
+      }
+    },
+  });
 
-
+//   console.log("touched",touched)
+// console.log(
+//   "Registration ~ errors",
+//   errors
+// );
   
 
+// console.log(errors.firstName, touched.firstName)
     return (
       <Box position={'relative'}>
         <Container
@@ -169,11 +122,14 @@ export default function SignUp() {
             </Stack>
            
   
-            <Box mt={10} Box as={'form'} onSubmit={handleSubmit}>
+            <form mt={10} onSubmit={handleSubmit}>
               <Stack spacing={4}>
-              <FormControl isInvalid={!!errors.firstName}>
-            <FormLabel>First Name</FormLabel>
+             <FormControl isInvalid={touched.firstName && errors.firstName}>
+            <FormLabel htmlFor="firstName" >First Name</FormLabel>
                 <Input
+                
+                onChange={handleChange}
+               onBlur={handleBlur}
                   placeholder="Firstname"
                   bg={'gray.100'}
                   border={0}
@@ -181,17 +137,18 @@ export default function SignUp() {
                   _placeholder={{
                     color: 'gray.500',
                   }}
-                  type="text"
+                  type="firstName"
+                  id="firstName"
               name="firstName"
-              value={details.firstName}
-              onChange={handleChange}
-              onFocus={() => setErrors({})}
+              value={values.firstName}
+       
                 />
-                {errors.firstName && (
+                {errors.firstName && touched.firstName && (
               <FormErrorMessage>{errors.firstName}</FormErrorMessage>
             )}
+         
           </FormControl>
-          <FormControl isInvalid={!!errors.lastName}>
+          <FormControl isInvalid={touched.lastName && errors.lastName}>
             <FormLabel>Last Name</FormLabel>
                 <Input
                   placeholder="Lastname"
@@ -201,19 +158,21 @@ export default function SignUp() {
                   _placeholder={{
                     color: 'gray.500',
                   }}
-                  type="text"
+                  type="lastName"
               name="lastName"
-              value={details.lastName}
+              id="lastName"
+              value={values.lastName}
               onChange={handleChange}
-              onFocus={() => setErrors({})}
+              onBlur={handleBlur}
                 />
                  {errors.lastName && (
               <FormErrorMessage>{errors.lastName}</FormErrorMessage>
             )}
                 </FormControl>
-                <FormControl isInvalid={!!errors.email}>
+                <FormControl isInvalid={touched.email && errors.email}>
             <FormLabel>Email address</FormLabel>
             <Input
+   
             placeholder="Enter Email"
             bg={'gray.100'}
             border={0}
@@ -221,15 +180,16 @@ export default function SignUp() {
             _placeholder={{
               color: 'gray.500',
             }}
+            id="email"
               type="email"
               name="email"
-              value={details.email}
+              value={values.email}
               onChange={handleChange}
-              onFocus={() => setErrors({})}
+              onBlur={handleBlur}
             />
             {errors.email && <FormErrorMessage>{errors.email}</FormErrorMessage>}
           </FormControl>
-          <FormControl isInvalid={!!errors.password}>
+          <FormControl isInvalid={touched.password && errors.password}>
             <FormLabel>Password</FormLabel>
             <Input
             placeholder="Enter password"
@@ -239,19 +199,20 @@ export default function SignUp() {
             _placeholder={{
               color: 'gray.500',
             }}
+            id="password"
               type="password"
               name="password"
-              value={details.password}
+              value={values.password}
               onChange={handleChange}
-              onFocus={() => setErrors({})}
+              onBlur={handleBlur}
             />
             {errors.password && (
               <FormErrorMessage>{errors.password}</FormErrorMessage>
             )}
           </FormControl>
           <FormControl
-            isInvalid={!!errors.confirm}
-            isDisabled={isConfirmPasswordDisabled}
+            isInvalid={touched.confirm && errors.confirm}
+            // isDisabled={isConfirmPasswordDisabled}
           >
             <FormLabel>Confirm Password</FormLabel>
             <Input
@@ -262,11 +223,12 @@ export default function SignUp() {
            _placeholder={{
              color: 'gray.500',
            }}
+           id="confirm"
               type="password"
               name="confirm"
               onChange={handleChange}
-              value={details.confirm}
-              onFocus={() => setErrors({})}
+              value={values.confirm}
+              onBlur={handleBlur}
             />
             {errors.confirm && (
               <FormErrorMessage>{errors.confirm}</FormErrorMessage>
@@ -280,6 +242,7 @@ export default function SignUp() {
                 
               </Stack>
               <Input
+              isDisabled={errors.firstName || errors.lastName || errors.email || errors.password || errors.confirm || values.firstName===""|| values.lastName===""||values.confirm===""||values.password===""||values.email===""}
               type="submit" value="Submit"
                 fontFamily={'heading'}
                 mt={8}
@@ -292,7 +255,7 @@ export default function SignUp() {
          
                 }}/>
                 <Text>Already Have An Account? <Text onClick={()=>navigate("/login",{ replace: true ,state:{from:{pathname:from}}})}>Sign In</Text></Text>
-            </Box>
+            </form>
         
         
           </Stack>

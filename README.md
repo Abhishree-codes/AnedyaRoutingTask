@@ -2,7 +2,9 @@
 
 # Description
 
-This is a react application that implements private routing and redirects user to the Login page if they are not authenticated. I've implemented it so the user is directed back to whatever page they were on before logging in (either after being redirected from a protected route, or choosing to login themselves through the navbar login button).
+This is a react application that implements private routing and redirects user to the Login page if they are not authenticated. The authetication is managed using React's context API. 
+
+I've implemented it so the user is directed back to whatever page they were on before logging in (either after being redirected from a protected route, or choosing to login themselves through the navbar login button).
 
 The implementation also ensures that clicking the back button post-login returns users to the page they were on before accessing the login route. 
 
@@ -14,6 +16,7 @@ In short, the login page is simply not added in the browsing stack after success
 - [Chakra UI](https://chakra-ui.com/) for styling.
 - [Netlify](https://www.netlify.com/) for deploying the app.
 - Local storage for storing user data upon registration
+- React Context API for implementing login and logout functionality and managing the user's authorization status in the application.
 
 ## Protected Routes
 
